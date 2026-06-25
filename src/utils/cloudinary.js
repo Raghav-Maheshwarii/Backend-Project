@@ -15,8 +15,8 @@ const uploadOnCloudinary = async (localFilePath) => {
             folder: 'Videotube',
         });
 
-        console.log('File uploaded successfully:', response.secure_url);
-        // fs.unlinkSync(localFilePath);
+        // console.log('File uploaded successfully:', response.secure_url);
+        fs.unlinkSync(localFilePath);
         return response;
     } catch (error) {
         if (localFilePath && fs.existsSync(localFilePath))
