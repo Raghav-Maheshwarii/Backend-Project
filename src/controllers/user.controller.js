@@ -8,19 +8,17 @@ import { uploadOnCloudinary } from '../utils/cloudinary.js';
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
         const user = await User.findById(userId);
-        const accessToken = user.generateAccessToken();
-        const refreshToken = user.generateRefreshToken();
-
+        const accessToken = await user.generateAccessToken();
+        const refreshToken = await user.generateRefreshToken();
+        
         user.refreshToken = refreshToken;
         await user.save({ validateBeforeSave: false });
-
         return { accessToken, refreshToken };
     }
     catch (error) {
         throw new ApiError(500, "Something went wrong while generating access n refresh tokens");
     }
 }
-
 
 
 const registerUser = asyncHandler(async (req, res) => {
@@ -78,9 +76,9 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
     const { username, email, password } = req.body;
-    if (!username || !email) throw new ApiError(400, "username or email is required");
+    if (!(username || email)) throw new ApiError(400, "username or email is required");
 
-    const user = User.findOne({
+    const user = await User.findOne({
         $or: [{ username }, { email }]
     })
     if (!user) throw new ApiError(404, "User does not exists");
@@ -110,7 +108,7 @@ const loginUser = asyncHandler(async (req, res) => {
                     accessToken,
                     refreshToken
                 },
-                "User loggen in successfully"
+                "User logged in successfully"
             )
         )
         ;
@@ -126,7 +124,7 @@ const logoutUser = asyncHandler(async (req, res) => {
             }
         },
         {
-            new: true
+            returnDocument: "after"
         }
     )
 
