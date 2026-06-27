@@ -51,9 +51,8 @@ const userSchema = new mongoose.Schema(
 
 // not to use a arrow function here .. it does not have the context
 userSchema.pre('save', async function () {
-    if (!this.isModified('password')) return ;
+    if (!this.isModified('password')) return;
     this.password = await bcrypt.hash(this.password, 10);
-
 });
 
 userSchema.methods.isPasswordCorrect = async function (password) {
